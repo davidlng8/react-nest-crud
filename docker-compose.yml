@@ -11,9 +11,9 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
-  backend:
+  server:
     build:
-      context: ./apps/backend
+      context: ./apps/server
     container_name: contacts_backend
     env_file:
       - .env
@@ -22,7 +22,7 @@ services:
     depends_on:
       - postgres
     volumes:
-      - ./apps/backend:/usr/src/app
+      - ./apps/server:/usr/src/app
       - /usr/src/app/node_modules
 
 volumes:
