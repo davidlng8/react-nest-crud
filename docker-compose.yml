@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: contacts_postgres
+    env_file:
+      - .env
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./apps/backend
+    container_name: contacts_backend
+    env_file:
+      - .env
+    ports:
+      - "${BACKEND_PORT}:3000"
+    depends_on:
+      - postgres
+    volumes:
+      - ./apps/backend:/usr/src/app
+      - /usr/src/app/node_modules
+
+volumes:
+  pgdata:
