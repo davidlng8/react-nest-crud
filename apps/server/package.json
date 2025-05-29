@@ -1,0 +1,11 @@
+{
+  "name": "contacts-server",
+  "version": "1.0.0",
+  "description": "Backend NestJS application for contact CRUD application",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
