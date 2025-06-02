@@ -3,27 +3,36 @@ version: "3.8"
 services:
   postgres:
     image: postgres:15
-    container_name: contacts_postgres
-    env_file:
-      - .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "${POSTGRES_PORT}:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
 
   server:
     build:
       context: ./apps/server
-    container_name: contacts_backend
-    env_file:
-      - .env
     ports:
-      - "${BACKEND_PORT}:3000"
-    depends_on:
-      - postgres
+      - "${BACKEND_PORT}:${BACKEND_PORT}"
+    env_file: .env
     volumes:
       - ./apps/server:/usr/src/app
       - /usr/src/app/node_modules
+    command: ["npm", "run", "start:dev"]
+    depends_on:
+      - postgres
 
-volumes:
-  pgdata:
+  ui:
+    build:
+      context: ./apps/ui
+    ports:
+      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+    env_file: .env
+    volumes:
+      - ./apps/ui:/app
+      - /app/node_modules
+    command: ["npm", "run", "dev", "--", "--host"]
+    # command: ["serve", "-s", "dist", "-l", "${FRONTEND_PORT}"]
+    depends_on:
+      - server
