@@ -9,9 +9,9 @@ RUN npm install
 
 COPY . .
 
-RUN npm run build
+# RUN npm run build
 
 # For Hot reload, include an exposed port
-EXPOSE 3011
+# EXPOSE 3011
 CMD ["npm", "run", "start:dev"]
 #CMD ["npm", "run", "start"]
