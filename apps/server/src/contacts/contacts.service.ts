@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, UpdateResult } from "typeorm";
+import { Repository } from "typeorm";
 import { CreateContactDTO, IContact } from "@/definitions/contacts/contact";
 import { ContactDiff } from "@/entities/contact-diff.entity";
 
@@ -31,6 +31,15 @@ export class ContactsService {
 
   async create(contact: CreateContactDTO): Promise<Contact> {
     return this.contact.save(contact);
+  }
+
+  async delete(contactId: string) {
+    const contact = await this.findOne(contactId);
+    if (!contact)
+      throw new NotFoundException("Cannot delete contact that doesnt exist");
+    const deleteResult = await this.contact.delete({ contactId });
+    if (deleteResult?.affected !== 1)
+      throw new InternalServerErrorException("Error deleting record");
   }
 
   async getUpdateHistory(contactId: string, page = 0) {
@@ -70,6 +79,31 @@ export class ContactsService {
       data: prunedHistory,
       pages: historyCount <= limit ? 1 : Math.ceil(historyCount / limit),
     };
+  }
+
+  async getUpdateSummary(contactId: string) {
+    const history = await this.changeLog.find({
+      where: { contactId },
+      // TODO: Add pagination later
+      take: 5,
+      order: {
+        updatedAt: "desc",
+      },
+      select: {
+        updatedAt: true,
+        contactHistoryId: true,
+      },
+      relations: {
+        diffs: true,
+      },
+    });
+
+    const summary = history.map((h) => ({
+      when: h.updatedAt,
+      updatedFields: h.diffs?.flatMap(({ field }) => [field]),
+    }));
+
+    return summary;
   }
 
   private async createDiff(

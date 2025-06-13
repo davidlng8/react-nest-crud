@@ -8,6 +8,7 @@ import { objectIsSet } from "@/utils/data.util";
 import {
   Body,
   Controller,
+  Delete,
   Get,
   MethodNotAllowedException,
   Param,
@@ -41,6 +42,12 @@ export class ContactController {
   }
 
   @Public()
+  @Get("/history-summary/:contactId")
+  async getContactUpdateSummary(@Param("contactId") conatactId: string) {
+    return this.contactsService.getUpdateSummary(conatactId);
+  }
+
+  @Public()
   @Patch("/:contactId")
   async updateContact(
     @Param("contactId") contactId: string,
@@ -51,6 +58,12 @@ export class ContactController {
         "Did you mean to delete the contact?"
       );
     return this.contactsService.update(contactId, body);
+  }
+
+  @Public()
+  @Delete("/:contactId")
+  async deleteContact(@Param("contactId") contactId: string) {
+    await this.contactsService.delete(contactId);
   }
 
   @Public()

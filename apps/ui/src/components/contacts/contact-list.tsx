@@ -17,8 +17,8 @@ export const ContactList = ({
    */
   const filteredContacts = contacts.filter(
     (contact) =>
-      contact.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      contact.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      contact.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      contact.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       contact.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       contact.phone.includes(searchTerm)
   );
@@ -48,7 +48,7 @@ export const ContactList = ({
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {filteredContacts.map((contact) => (
             <ContactCard
-              key={contact.id}
+              key={contact.contactId}
               contact={contact}
               onEdit={onEdit}
               onDelete={onDelete}

@@ -1,21 +1,53 @@
-export interface Contact {
-  id: string;
-  first_name: string;
-  last_name: string;
+export interface ContactInput {
+  firstName: string;
+  lastName: string;
   email: string;
   phone: string;
-  created_at: string;
-  updated_at: string;
+}
+
+export interface ContactHistory {
+  data: unknown;
+}
+
+export interface ContactHistorySummary {
+  when: Date;
+  updatedFields: string[];
+}
+
+export interface Contact extends ContactInput {
+  contactId?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  updateHistory?: unknown[];
 }
 
 // TODO: Configure method signatures
 export interface ContactListProps {
   contacts: Contact[];
-  onEdit: () => void;
+  onEdit: (contact: Contact) => void;
   onDelete: () => void;
-  onViewHistory?: () => void;
 }
 
 export interface ContactCardProps extends Omit<ContactListProps, "contacts"> {
   contact: Contact;
+}
+
+export interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export interface ContactHistoryProps extends ModalProps {
+  history: ContactHistorySummary[];
+  contactName: string;
+}
+
+export interface ContactFormProps extends ModalProps {
+  onSubmit: (contact: ContactInput) => Promise<void>;
+  contact?: Contact | null;
+  isLoading?: boolean;
+}
+
+export interface DeleteFormProps extends Omit<ContactFormProps, "onSubmit"> {
+  onSubmit: (contactId: string) => Promise<void>;
 }
