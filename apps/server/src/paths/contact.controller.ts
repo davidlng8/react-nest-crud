@@ -63,7 +63,11 @@ export class ContactController {
   @Public()
   @Delete("/:contactId")
   async deleteContact(@Param("contactId") contactId: string) {
-    await this.contactsService.delete(contactId);
+    await Promise.all([
+      this.contactsService.delete(contactId),
+      new Promise((resolve) => setTimeout(resolve, 4000)),
+    ]);
+    return;
   }
 
   @Public()

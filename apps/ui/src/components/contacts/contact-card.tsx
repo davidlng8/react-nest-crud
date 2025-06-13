@@ -75,7 +75,7 @@ export const ContactCard = ({
               text={<FontAwesomeIcon className="h-4 w-4" icon={faEdit} />}
             />
             <Button
-              onClick={() => onDelete()}
+              onClick={() => onDelete(contact)}
               classes="h-8 w-8 p-0 text-red-600 hover:text-red-700"
               text={<FontAwesomeIcon className="h-4 w-4" icon={faTrash} />}
             />

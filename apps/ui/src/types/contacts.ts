@@ -25,7 +25,7 @@ export interface Contact extends ContactInput {
 export interface ContactListProps {
   contacts: Contact[];
   onEdit: (contact: Contact) => void;
-  onDelete: () => void;
+  onDelete: (contact: Contact) => void;
 }
 
 export interface ContactCardProps extends Omit<ContactListProps, "contacts"> {
@@ -44,8 +44,10 @@ export interface ContactHistoryProps extends ModalProps {
 
 export interface ContactFormProps extends ModalProps {
   onSubmit: (contact: ContactInput) => Promise<void>;
+  onDelete?: () => Promise<void>;
   contact?: Contact | null;
   isLoading?: boolean;
+  deleteMode?: boolean;
 }
 
 export interface DeleteFormProps extends Omit<ContactFormProps, "onSubmit"> {

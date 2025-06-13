@@ -3,14 +3,21 @@ import { Button } from "@/components/page-ui/button";
 import { Header } from "@/components/page-ui/header";
 import type { Contact, ContactInput } from "@/types/contacts";
 import { ContactList } from "@/components/contacts/contact-list";
-import { createContact, fetchContacts, updateContact } from "@/lib/api/contact";
+import {
+  createContact,
+  fetchContacts,
+  updateContact,
+  deleteContact,
+} from "@/lib/api/contact";
 import { ContactForm } from "@/components/contacts/contact-form";
 import toast from "react-hot-toast";
 
 const HomePage = () => {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isDeletModalOpen, setIsDeleteModalOpen] = useState(false);
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
+  const [deletingContact, setDeleteingContact] = useState<Contact | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleCreateContact = async (contactData: ContactInput) => {
@@ -64,8 +71,7 @@ const HomePage = () => {
       setContacts((prev) =>
         prev.map((c) => (c.contactId === contactId ? updatedContact : c))
       );
-      setEditingContact(null);
-      setIsFormOpen(false);
+      handleCloseForm();
       toast.success("Contact successfully updated");
     } catch (error) {
       console.error(error);
@@ -75,15 +81,12 @@ const HomePage = () => {
     }
   };
 
-  /*const handleCloseHistoryModal = () => {
-    setIsHistoryModalOpen(false);
-    setSelectedContactHistory(null);
-  };*/
-
-  /*const handleDeleteContact = async () => {
-    const { contactId } = editingContact || {};
-    // TODO: Add toast to show error for trying to delete a contact with no ID
-    if (!contactId) return;
+  const handleDeleteContact = async () => {
+    const { contactId } = deletingContact || {};
+    if (!contactId) {
+      toast.error("Something went wrong trying to delete this contact");
+      return;
+    }
 
     setIsLoading(true);
     try {
@@ -91,12 +94,16 @@ const HomePage = () => {
       setContacts((prev) => prev.filter((c) => c.contactId !== contactId));
       toast.success("Contact successfully deleted.");
     } catch (error) {
+      toast.error("Something went wrong trying to delete this contact");
       console.error({
         description: "Failed to delete contact. Please try again.",
         error,
       });
+    } finally {
+      handleCloseDelete();
+      setIsLoading(false);
     }
-  };*/
+  };
 
   const handleEditContact = (contact: Contact) => {
     setEditingContact(contact);
@@ -106,6 +113,16 @@ const HomePage = () => {
   const handleCloseForm = () => {
     setIsFormOpen(false);
     setEditingContact(null);
+  };
+
+  const handleDeletingContact = (contact: Contact) => {
+    setDeleteingContact(contact);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleCloseDelete = () => {
+    setIsDeleteModalOpen(false);
+    setDeleteingContact(null);
   };
 
   useEffect(() => {
@@ -136,7 +153,7 @@ const HomePage = () => {
         <ContactList
           contacts={contacts}
           onEdit={handleEditContact}
-          onDelete={() => console.log("Do delete")}
+          onDelete={handleDeletingContact}
         />
 
         {/** Modal to edit or add contact */}
@@ -146,6 +163,17 @@ const HomePage = () => {
           onSubmit={editingContact ? handleUpdateContact : handleCreateContact}
           contact={editingContact}
           isLoading={isLoading}
+        />
+
+        {/** Modal to edit or add contact */}
+        <ContactForm
+          isOpen={isDeletModalOpen}
+          onClose={handleCloseDelete}
+          onSubmit={handleUpdateContact}
+          contact={deletingContact}
+          isLoading={isLoading}
+          deleteMode
+          onDelete={handleDeleteContact}
         />
       </main>
     </div>

@@ -155,7 +155,6 @@ export class ContactsService {
     const updatedRecord = await this.contact.findOneBy({
       contactId,
     });
-    console.log({ where: "updated contact", contactId, updatedRecord });
 
     const history = {
       contactId,

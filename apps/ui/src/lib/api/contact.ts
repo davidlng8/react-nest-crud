@@ -51,14 +51,13 @@ export async function updateContact(
   return response.json();
 }
 
-export async function deleteContact(contactId: string): Promise<Contact> {
+export async function deleteContact(contactId: string): Promise<void> {
   const response = await fetch(`${BASE_API_URL}${BASE_API_PATH}/${contactId}`, {
     method: "DELETE",
   });
   if (!response.ok) {
     throw new Error("Failed to update contact");
   }
-  return response.json();
 }
 
 export async function getHistorySummary(
