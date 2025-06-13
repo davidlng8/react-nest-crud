@@ -9,8 +9,10 @@ export const ContactForm = ({
   isOpen,
   onClose,
   onSubmit,
+  onDelete,
   contact,
   isLoading = false,
+  deleteMode = false,
 }: ContactFormProps) => {
   // Initial state for formdata
   const [firstName, setFirstName] = useState("");
@@ -39,8 +41,17 @@ export const ContactForm = ({
     onClose();
   };
 
+  // TODO: Add phone number validation
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (deleteMode) {
+      if (onDelete) {
+        await onDelete();
+      }
+      return;
+    }
 
     if (!firstName || !lastName || !email || !phone) {
       alert("Please fill in all fields");
@@ -57,13 +68,32 @@ export const ContactForm = ({
     await onSubmit(contactData);
   };
 
+  const buttonText = deleteMode
+    ? isLoading
+      ? "Deleting..."
+      : "Delete Contact"
+    : isLoading
+    ? "Saving..."
+    : contact
+    ? "Update"
+    : "Create";
+
+  const btnBgColor = deleteMode ? "bg-red-500" : "bg-green-600";
+  const buttonClass = `flex-1 px-3 py-3 text-white ${btnBgColor} text-heavy rounded-lg`;
+
   return (
     <Modal isOpen={isOpen} onClose={handleClose}>
       {/** close modal button */}
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">
-          {contact ? "Edit Contact" : "Add New Contact"}
-        </h2>
+        {deleteMode ? (
+          <h2 className="text-lg font-semibold">
+            Are you sure you wish to delete this contact?
+          </h2>
+        ) : (
+          <h2 className="text-lg font-semibold">
+            {contact ? "Edit Contact" : "Add New Contact"}
+          </h2>
+        )}
         <button
           onClick={handleClose}
           className="text-gray-400 hover:text-gray-600"
@@ -78,7 +108,7 @@ export const ContactForm = ({
             id="firstName"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
-            disabled={isLoading}
+            disabled={isLoading || deleteMode}
             required
           />
         </div>
@@ -89,7 +119,7 @@ export const ContactForm = ({
             id="lastName"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
-            disabled={isLoading}
+            disabled={isLoading || deleteMode}
             required
           />
         </div>
@@ -101,7 +131,7 @@ export const ContactForm = ({
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            disabled={isLoading}
+            disabled={isLoading || deleteMode}
             required
           />
         </div>
@@ -112,7 +142,7 @@ export const ContactForm = ({
             id="phone"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            disabled={isLoading}
+            disabled={isLoading || deleteMode}
             required
           />
         </div>
@@ -129,9 +159,9 @@ export const ContactForm = ({
           <Button
             type="submit"
             disabled={isLoading}
-            classes="flex-1 px-3 py-3 bg-green-600 text-white text-heavy rounded-lg"
-            text={isLoading ? "Saving..." : contact ? "Update" : "Create"}
-          ></Button>
+            classes={buttonClass}
+            text={buttonText}
+          />
         </div>
       </form>
     </Modal>
