@@ -53,3 +53,9 @@ export interface ContactFormProps extends ModalProps {
 export interface DeleteFormProps extends Omit<ContactFormProps, "onSubmit"> {
   onSubmit: (contactId: string) => Promise<void>;
 }
+
+export enum BroadCastEvents {
+  CREATE_CONTACT = "CreateContact",
+  UPDATE_CONTACT = "UpdateContact",
+  DELETE_CONTACT = "DeleteContact",
+}

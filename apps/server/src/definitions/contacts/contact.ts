@@ -43,3 +43,9 @@ export class CreateContactDTO {
   email!: string;
   phone!: string;
 }
+
+export enum BroadCastEvents {
+  CREATE_CONTACT = "CreateContact",
+  UPDATE_CONTACT = "UpdateContact",
+  DELETE_CONTACT = "DeleteContact",
+}

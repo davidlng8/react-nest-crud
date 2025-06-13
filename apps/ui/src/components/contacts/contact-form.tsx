@@ -65,7 +65,12 @@ export const ContactForm = ({
       phone,
     };
 
-    await onSubmit(contactData);
+    try {
+      await onSubmit(contactData);
+      handleClose();
+    } catch (e) {
+      console.error("submisison error", e);
+    }
   };
 
   const buttonText = deleteMode
@@ -150,7 +155,7 @@ export const ContactForm = ({
           <Button
             type="button"
             variant="outline"
-            onClick={onClose}
+            onClick={handleClose}
             disabled={isLoading}
             className={"bg-green-700 rounded-sm"}
             classes="flex-1 px-3 py-3 bg-slate-400 rounded-lg"

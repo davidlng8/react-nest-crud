@@ -6,11 +6,12 @@ import { Repository } from "typeorm";
 import { ContactsService } from "./contacts.service";
 import { ContactDiff } from "@/entities/contact-diff.entity";
 import { ContactHistory } from "@/entities/contact-history.entity";
+import { ContactsGateway } from "@/helpers/contacts.gateway";
 
 @Module({
   imports: [TypeOrmModule.forFeature([Contact, ContactDiff, ContactHistory])],
   controllers: [ContactController],
-  providers: [ContactsService],
+  providers: [ContactsService, ContactsGateway],
   exports: [ContactsService],
 })
 export class ContactsModule implements OnModuleInit {
@@ -28,13 +29,13 @@ export class ContactsModule implements OnModuleInit {
           firstName: "David",
           lastName: "Gardner",
           email: "david@gardner.com",
-          phone: "7873654833",
+          phone: "6464809314",
         },
         {
           firstName: "Jenna",
           lastName: "Brown",
           email: "jb@example.com",
-          phone: "9227876436",
+          phone: "6567827354",
         },
       ]);
     }
