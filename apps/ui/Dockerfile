@@ -12,7 +12,7 @@ COPY . .
 RUN npm run build
 
 # For hot reload, expose a static port
-EXPOSE 3110
-# EXPOSE ${FRONTEND_PORT}
+#EXPOSE 3110
+EXPOSE ${FRONTEND_PORT}
 
 CMD ["npm", "run", "dev", "--", "--host"]
