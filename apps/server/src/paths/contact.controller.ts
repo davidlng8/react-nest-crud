@@ -63,11 +63,8 @@ export class ContactController {
   @Public()
   @Delete("/:contactId")
   async deleteContact(@Param("contactId") contactId: string) {
-    await Promise.all([
-      this.contactsService.delete(contactId),
-      new Promise((resolve) => setTimeout(resolve, 4000)),
-    ]);
-    return;
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await this.contactsService.delete(contactId);
   }
 
   @Public()
@@ -75,12 +72,7 @@ export class ContactController {
   async createContact(@Body() body: CreateContactDTO) {
     if (!objectIsSet(body))
       throw new MethodNotAllowedException("Cannot create an empty contact");
-    const [createdContact] = await Promise.all([
-      this.contactsService.create(body),
-      // Concurrently run timer with create method and wait up to 20 seconds
-      // TODO: uncomment for submission
-      //new Promise((resolve) => setTimeout(resolve, 20000)),
-    ]);
-    return createdContact;
+    await new Promise((resolve) => setTimeout(resolve, 20000));
+    return this.contactsService.create(body);
   }
 }

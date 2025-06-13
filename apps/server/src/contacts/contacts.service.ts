@@ -7,18 +7,24 @@ import {
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { CreateContactDTO, IContact } from "@/definitions/contacts/contact";
+import {
+  BroadCastEvents,
+  CreateContactDTO,
+  IContact,
+} from "@/definitions/contacts/contact";
 import { ContactDiff } from "@/entities/contact-diff.entity";
+import { ContactsGateway } from "@/helpers/contacts.gateway";
 
 @Injectable()
 export class ContactsService {
   constructor(
     @InjectRepository(Contact)
-    private contact: Repository<Contact>,
+    private readonly contact: Repository<Contact>,
     @InjectRepository(ContactHistory)
-    private changeLog: Repository<ContactHistory>,
+    private readonly changeLog: Repository<ContactHistory>,
     @InjectRepository(ContactDiff)
-    private contactDiff: Repository<ContactDiff>
+    private readonly contactDiff: Repository<ContactDiff>,
+    private readonly contactGateway: ContactsGateway
   ) {}
 
   async findAll(): Promise<Contact[]> {
@@ -30,7 +36,17 @@ export class ContactsService {
   }
 
   async create(contact: CreateContactDTO): Promise<Contact> {
-    return this.contact.save(contact);
+    const newContact = await this.contact.save(contact);
+    if (contact) {
+      setTimeout(() => {
+        this.contactGateway.broadcastEvent(
+          BroadCastEvents.CREATE_CONTACT,
+          newContact
+        );
+      }, 600);
+    }
+
+    return newContact;
   }
 
   async delete(contactId: string) {
@@ -40,6 +56,14 @@ export class ContactsService {
     const deleteResult = await this.contact.delete({ contactId });
     if (deleteResult?.affected !== 1)
       throw new InternalServerErrorException("Error deleting record");
+
+    if (contact)
+      setTimeout(() => {
+        this.contactGateway.broadcastEvent(
+          BroadCastEvents.DELETE_CONTACT,
+          contact
+        );
+      }, 3000);
   }
 
   async getUpdateHistory(contactId: string, page = 0) {
@@ -173,6 +197,13 @@ export class ContactsService {
       savedHistory.contactHistoryId,
       new Date()
     );
+
+    setTimeout(() => {
+      this.contactGateway.broadcastEvent(
+        BroadCastEvents.UPDATE_CONTACT,
+        updatedRecord ?? existingContact
+      );
+    }, 600);
     return updatedRecord;
   }
 }

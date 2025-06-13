@@ -11,6 +11,12 @@ import {
 } from "@/lib/api/contact";
 import { ContactForm } from "@/components/contacts/contact-form";
 import toast from "react-hot-toast";
+import { useContactsSocket } from "@/lib/hooks/useContactsSocket";
+import {
+  recentlyCreatedTracker,
+  recentlyDeletedTracker,
+  recentlyUpdatedTracker,
+} from "@/lib/contactId.tracker";
 
 const HomePage = () => {
   const [contacts, setContacts] = useState<Contact[]>([]);
@@ -34,7 +40,8 @@ const HomePage = () => {
       }
 
       const newContact = await createContact(contactData);
-      setContacts((prev) => [...prev, newContact]);
+      setContacts((prev) => [newContact, ...prev]);
+      recentlyCreatedTracker.mark(newContact.contactId || "");
       setIsFormOpen(false);
       toast.success("Contact successfully created");
     } catch (error) {
@@ -71,6 +78,7 @@ const HomePage = () => {
       setContacts((prev) =>
         prev.map((c) => (c.contactId === contactId ? updatedContact : c))
       );
+      recentlyUpdatedTracker.mark(contactId);
       handleCloseForm();
       toast.success("Contact successfully updated");
     } catch (error) {
@@ -92,6 +100,7 @@ const HomePage = () => {
     try {
       await deleteContact(contactId);
       setContacts((prev) => prev.filter((c) => c.contactId !== contactId));
+      recentlyDeletedTracker.mark(contactId);
       toast.success("Contact successfully deleted.");
     } catch (error) {
       toast.error("Something went wrong trying to delete this contact");
@@ -130,6 +139,8 @@ const HomePage = () => {
       .then(setContacts)
       .catch((err) => console.error(err));
   }, []);
+
+  useContactsSocket(setContacts);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
